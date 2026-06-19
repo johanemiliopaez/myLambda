@@ -1,10 +1,6 @@
 import json
 
 
-MYSQL_PASSWORD_1 = "202778"
-MYSQL_PASSWORD_2 = "202778"
-
-
 
 
 def lambda_handler(event, context):

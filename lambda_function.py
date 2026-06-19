@@ -1,7 +1,7 @@
 import json
 
 
-MYSQL_PASSWORD = "202778"
+
 
 
 

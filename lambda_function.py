@@ -1,7 +1,6 @@
 import json
 
 
-variable_global = "202778"
 
 
 

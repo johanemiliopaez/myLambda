@@ -1,7 +1,7 @@
 import json
 
 
-MYSQL_PASSWORD = "password2026"
+variable_global = "2027"
 
 
 def lambda_handler(event, context):

@@ -1,7 +1,7 @@
 import json
 
 
-variable_global = "2027"
+variable_global = "202778"
 
 
 

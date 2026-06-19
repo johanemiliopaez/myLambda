@@ -1,7 +1,7 @@
 import json
 
 
-variable_global = "202778"
+MYSQL_PASSWORD = "202778"
 
 
 

@@ -7,6 +7,11 @@ on:
     paths:
       - lambda_function.py
       - .github/workflows/deploy-lambda.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - lambda_function.py
   workflow_dispatch:
 
 jobs:
@@ -19,11 +24,49 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      # ── Claude Security Review (solo en PRs) ──────────────────────────
+      - name: Obtener diff del PR
+        if: github.event_name == 'pull_request'
+        run: |
+          git diff origin/${{ github.base_ref }}...HEAD -- '*.py' > /tmp/pr.diff
+
+      - name: Revisar con Claude
+        if: github.event_name == 'pull_request'
+        id: review
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python .github/scripts/claude_review.py
+
+      - name: Comentar resultado en el PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        env:
+          REVIEW: ${{ steps.review.outputs.review }}
+        with:
+          script: |
+            const hasCritical = '${{ steps.review.outputs.has_critical }}' === 'true';
+            const emoji = hasCritical ? '🔴' : '🟢';
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `## ${emoji} Claude Security Review\n\n${process.env.REVIEW}`
+            });
+
+      - name: Bloquear si hay hallazgos CRITICAL
+        if: github.event_name == 'pull_request' && steps.review.outputs.has_critical == 'true'
+        run: |
+          echo "Hallazgos críticos encontrados. Corrige antes de hacer merge."
+          exit 1
+      # ─────────────────────────────────────────────────────────────────
 
       - name: Create deployment package
         run: zip function.zip lambda_function.py
@@ -36,6 +79,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Update Lambda function code
+        if: github.event_name != 'pull_request'
         run: |
           aws lambda update-function-code \
             --function-name "$LAMBDA_FUNCTION_NAME" \

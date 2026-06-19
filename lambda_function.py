@@ -19,24 +19,51 @@ def lambda_handler(event, context):
     elif isinstance(body, str):
         body = json.loads(body or "{}")
 
-    string1 = body.get("string1")
-    string2 = body.get("string2")
+    nombre = body.get("nombre")
+    apellido = body.get("apellido")
+    edad = body.get("edad")
+    correo = body.get("correo")
 
-    if string1 is None or string2 is None:
+    if None in (nombre, apellido, edad, correo):
         return {
             "statusCode": 400,
             "body": json.dumps(
-                {"error": "Los campos string1 y string2 son obligatorios"}
+                {
+                    "error": (
+                        "Los campos nombre, apellido, edad y correo son obligatorios"
+                    )
+                }
             ),
         }
 
-    if not isinstance(string1, str) or not isinstance(string2, str):
+    if not isinstance(nombre, str) or not isinstance(apellido, str):
         return {
             "statusCode": 400,
-            "body": json.dumps({"error": "Los campos string1 y string2 deben ser texto"}),
+            "body": json.dumps({"error": "Los campos nombre y apellido deben ser texto"}),
+        }
+
+    if not isinstance(correo, str):
+        return {
+            "statusCode": 400,
+            "body": json.dumps({"error": "El campo correo debe ser texto"}),
+        }
+
+    if not isinstance(edad, int):
+        return {
+            "statusCode": 400,
+            "body": json.dumps({"error": "El campo edad debe ser numerico entero"}),
         }
 
     return {
         "statusCode": 200,
-        "body": json.dumps({"resultado concatenado ": string1 + string2}),
+        "body": json.dumps(
+            {
+                "persona": {
+                    "nombre": nombre,
+                    "apellido": apellido,
+                    "edad": edad,
+                    "correo": correo,
+                }
+            }
+        ),
     }

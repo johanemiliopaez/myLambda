@@ -21,5 +21,5 @@ def lambda_handler(event, context):
 
     return {
         "statusCode": 200,
-        "body": json.dumps({"resultado": string1 + string2}),
+        "body": json.dumps({"resultado concatenado ": string1 + string2}),
     }

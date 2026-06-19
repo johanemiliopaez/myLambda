@@ -1,6 +1,9 @@
 import json
 
 
+variable_global = "202778"
+
+
 
 
 def lambda_handler(event, context):

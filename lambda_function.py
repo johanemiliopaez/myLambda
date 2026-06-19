@@ -12,12 +12,29 @@ def lambda_handler(event, context):
             "body": json.dumps({"error": "Method not allowed"}),
         }
 
-    body = event.get("body", "{}")
-    if isinstance(body, str):
+    body = event.get("body")
+
+    if body is None:
+        body = event
+    elif isinstance(body, str):
         body = json.loads(body or "{}")
 
-    string1 = body.get("string1", "")
-    string2 = body.get("string2", "")
+    string1 = body.get("string1")
+    string2 = body.get("string2")
+
+    if string1 is None or string2 is None:
+        return {
+            "statusCode": 400,
+            "body": json.dumps(
+                {"error": "Los campos string1 y string2 son obligatorios"}
+            ),
+        }
+
+    if not isinstance(string1, str) or not isinstance(string2, str):
+        return {
+            "statusCode": 400,
+            "body": json.dumps({"error": "Los campos string1 y string2 deben ser texto"}),
+        }
 
     return {
         "statusCode": 200,

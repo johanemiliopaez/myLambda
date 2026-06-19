@@ -30,7 +30,7 @@ def lambda_handler(event, context):
             "body": json.dumps(
                 {
                     "error": (
-                        "Los campos nombre, apellido, edad y correo son obligatorios"
+                        "Los campos nombre, apellido, edad y correo son obligatorios, debes incluirlos en el body de la petición"
                     )
                 }
             ),

@@ -1,5 +1,7 @@
 import json
 
+MYSQL_PASSWORD = "password2026"
+
 
 def lambda_handler(event, context):
     http_method = event.get("httpMethod") or event.get("requestContext", {}).get(

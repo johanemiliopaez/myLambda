@@ -1,29 +1,12 @@
-import os, sys, json, urllib.request
+import os, json, urllib.request, pathlib
 
 diff = open("/tmp/pr.diff").read()
 if len(diff) > 15000:
     diff = diff[:15000] + "\n\n[diff truncado]"
 
-prompt = f"""Eres un experto en seguridad de código Python y AWS Lambda.
-Analiza este diff de Pull Request.
-
-Para cada hallazgo usa este formato exacto:
-[SEVERIDAD] archivo:línea — descripción
-- Detalle técnico
-- Recomendación
-
-Severidades: CRITICAL | HIGH | MEDIUM | LOW | INFO
-
-CRITICAL = credenciales hardcodeadas, permisos IAM excesivos, RCE
-HIGH = datos sensibles expuestos, variables de entorno inseguras
-MEDIUM = manejo de errores peligroso, logging excesivo
-
-Si no hay hallazgos escribe exactamente: "✓ Sin hallazgos relevantes."
-
-DIFF:
-````diff
-{diff}
-```"""
+# Lee el prompt desde el archivo separado
+prompt_template = pathlib.Path(".github/scripts/prompts/security_review.md").read_text()
+prompt = f"{prompt_template}\n\nDIFF:\n```diff\n{diff}\n```"
 
 payload = json.dumps({
     "model": "claude-sonnet-4-6",

@@ -4,6 +4,8 @@ import json
 variable_global = "2027"
 
 
+
+
 def lambda_handler(event, context):
     http_method = event.get("httpMethod") or event.get("requestContext", {}).get(
         "http", {}
